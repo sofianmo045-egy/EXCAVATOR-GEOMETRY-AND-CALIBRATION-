@@ -1,232 +1,220 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Excavator Survey Pro - M.Shehata</title>
+    <title>Excavator Calculator</title>
     <style>
-        :root {
-            --primary-bg: #0f172a;
-            --accent-blue: #38bdf8;
-            --success-green: #059669;
-            --text-gray: #94a3b8;
-            --pds-orange: #f59e0b;
-            --error-red: #ef4444;
-        }
-
-        body { 
-            background-color: #f1f5f9; 
-            min-height: 100vh; 
-            display: flex; justify-content: center; align-items: flex-start;
-            padding: 15px 10px; font-family: 'Segoe UI', sans-serif; margin: 0; box-sizing: border-box;
-        }
-
-        .card { 
-            max-width: 550px; width: 100%; background: #fff; border-radius: 20px; 
-            overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;
-        }
-
-        .header { background: var(--primary-bg); color: white; padding: 20px; text-align: center; }
-        .header h1 { margin: 0; font-size: 20px; }
-        .header a { color: var(--accent-blue); text-decoration: none; font-size: 13px; font-weight: bold; }
-
-        .tabs { display: flex; background: #1e293b; }
-        .tab-btn { 
-            flex: 1; padding: 15px 5px; color: var(--text-gray); background: none; 
-            border: none; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 12px;
-        }
-        .tab-btn.active { color: #fff; border-bottom: 3px solid var(--accent-blue); background: var(--primary-bg); }
-        
-        .tab-content { display: none; padding-bottom: 20px; }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; display: flex; justify-content: center; }
+        .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        .tabs { display: flex; justify-content: space-around; margin-bottom: 20px; border-bottom: 2px solid #ccc; }
+        .tab { padding: 10px; cursor: pointer; font-weight: bold; width: 50%; text-align: center; }
+        .tab.active { border-bottom: 3px solid #007bff; color: #007bff; }
+        .tab-content { display: none; }
         .tab-content.active { display: block; }
-
-        .group { padding: 15px 20px; border-bottom: 1px solid #f1f5f9; }
-        .group-title { font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 10px; display: block; }
-        
-        .input-row { display: flex; gap: 8px; margin-bottom: 8px; }
-        .input-col { flex: 1; }
-        .input-col label { font-size: 10px; color: #64748b; font-weight: 600; display: block; margin-bottom: 3px; }
-        .input-col input { 
-            width: 100%; padding: 10px; border: 1.5px solid #e2e8f0; border-radius: 8px; 
-            font-size: 14px; text-align: center; outline: none;
-        }
-
-        .calc-btn { 
-            width: calc(100% - 40px); margin: 20px 20px 5px; padding: 15px; 
-            background: var(--success-green); color: white; border: none; 
-            border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; 
-        }
-
-        .reset-btn {
-            background: transparent; color: var(--error-red); border: 1px solid var(--error-red);
-            padding: 8px; border-radius: 8px; font-size: 11px; cursor: pointer; margin: 5px 20px 15px; width: calc(100% - 40px);
-        }
-
-        .results-area { background: var(--primary-bg); color: #f8fafc; padding: 15px 20px; }
-        .res-section-title { color: var(--pds-orange); font-size: 12px; font-weight: bold; border-bottom: 1px solid #334155; padding-bottom: 4px; margin: 10px 0; }
-        .res-line { display: flex; justify-content: space-between; margin: 8px 0; font-size: 14px; }
-        .res-line b { color: #fff; }
-        
-        .footer { padding: 15px; font-size: 10px; color: #64748b; text-align: center; background: #fafafa; }
+        .input-group { margin-bottom: 10px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        .row { display: flex; gap: 10px; }
+        input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; text-align: center; }
+        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        button:hover { background: #0056b3; }
+        .results { margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 5px; }
+        .results p { margin: 5px 0; font-weight: bold; }
+        .reset-btn { background: #dc3545; margin-top: 10px; }
+        .reset-btn:hover { background: #a71d2a; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div class="header">
-        <h1>Excavator Survey Tool</h1>
-        <a href="https://linkedin.com/in/mohamed-shehata-m045" target="_blank">By: Mohamed Shehata</a>
-    </div>
-
+<div class="container">
     <div class="tabs">
-        <button id="btn-geo" class="tab-btn active" onclick="openTab(event, 'tab-geometry')">Geometry</button>
-        <button id="btn-crane" class="tab-btn" onclick="openTab(event, 'tab-crane-config')">Crane Config</button>
+        <div class="tab active" id="tab1-btn" onclick="showTab(1)">Geometry</div>
+        <div class="tab" id="tab2-btn" onclick="showTab(2)">Crane Config</div>
     </div>
 
-    <div id="tab-geometry" class="tab-content active">
-        <div class="group">
-            <span class="group-title">Antennas Coordinates</span>
-            <div class="input-row">
-                <div class="input-col"><label>Ant1 X</label><input type="number" step="0.001" id="X1" class="st"></div>
-                <div class="input-col"><label>Y</label><input type="number" step="0.001" id="Y1" class="st"></div>
-                <div class="input-col"><label>Z</label><input type="number" step="0.001" id="Z1" class="st"></div>
-            </div>
-            <div class="input-row">
-                <div class="input-col"><label>Ant2 X</label><input type="number" step="0.001" id="X2" class="st"></div>
-                <div class="input-col"><label>Y</label><input type="number" step="0.001" id="Y2" class="st"></div>
-                <div class="input-col"><label>Z</label><input type="number" step="0.001" id="Z2" class="st"></div>
-            </div>
+    <div id="tab1" class="tab-content active">
+        <div class="input-group">
+            <label>Antenna 1 (X, Y, Z)</label>
+            <div class="row"><input type="number" id="x1" placeholder="X" class="st"><input type="number" id="y1" placeholder="Y" class="st"><input type="number" id="z1" placeholder="Z" class="st"></div>
         </div>
-        <div class="group">
-            <span class="group-title">Boom Pins (STBD & PORT)</span>
-            <div class="input-row">
-                <div class="input-col"><label>STBD X</label><input type="number" step="0.001" id="Xs" class="st"></div>
-                <div class="input-col"><label>Y</label><input type="number" step="0.001" id="Ys" class="st"></div>
-                <div class="input-col"><label>Z</label><input type="number" step="0.001" id="Zs" class="st"></div>
-            </div>
-            <div class="input-row">
-                <div class="input-col"><label>PORT X</label><input type="number" step="0.001" id="Xp" class="st"></div>
-                <div class="input-col"><label>Y</label><input type="number" step="0.001" id="Yp" class="st"></div>
-                <div class="input-col"><label>Z</label><input type="number" step="0.001" id="Zp" class="st"></div>
-            </div>
+        <div class="input-group">
+            <label>Antenna 2 (X, Y, Z)</label>
+            <div class="row"><input type="number" id="x2" placeholder="X" class="st"><input type="number" id="y2" placeholder="Y" class="st"><input type="number" id="z2" placeholder="Z" class="st"></div>
         </div>
-        <div class="group">
-            <span class="group-title">Heading Reference Point</span>
-            <div class="input-row">
-                <div class="input-col"><label>Bucket X</label><input type="number" step="0.001" id="Xb" class="st"></div>
-                <div class="input-col"><label>Y</label><input type="number" step="0.001" id="Yb" class="st"></div>
-            </div>
+        <div class="input-group">
+            <label>Boom Pin STBD (X, Y, Z)</label>
+            <div class="row"><input type="number" id="xs" placeholder="X" class="st"><input type="number" id="ys" placeholder="Y" class="st"><input type="number" id="zs" placeholder="Z" class="st"></div>
         </div>
-        <button class="calc-btn" onclick="calcGeo()">Calculate Geometry</button>
-        <div class="results-area">
-            <div class="res-section-title">GEOMETRY RESULTS</div>
-            <div class="res-line"><span>Machine Heading:</span> <b id="r-mH">---</b></div>
-            <div class="res-line"><span>Ant1 Offset (F,S,U):</span> <b id="r-a1">---</b></div>
-            <div class="res-line"><span>Ant2 Offset (F,S,U):</span> <b id="r-a2">---</b></div>
+        <div class="input-group">
+            <label>Boom Pin PORT (X, Y, Z)</label>
+            <div class="row"><input type="number" id="xp" placeholder="X" class="st"><input type="number" id="yp" placeholder="Y" class="st"><input type="number" id="zp" placeholder="Z" class="st"></div>
+        </div>
+        <div class="input-group">
+            <label>Bucket Center (X, Y, Z)</label>
+            <div class="row"><input type="number" id="xb" placeholder="X" class="st"><input type="number" id="yb" placeholder="Y" class="st"><input type="number" id="zb" placeholder="Z" class="st"></div>
+        </div>
+        <button onclick="calculateTab1()">Calculate Geometry</button>
+        <div class="results" id="res1">
+            <p>Heading: <span id="out-h">---</span></p>
+            <p>Antenna 1 Offsets: <span id="out-a1">---</span></p>
+            <p>Antenna 2 Offsets: <span id="out-a2">---</span></p>
+            <p>Antenna H Distance: <span id="out-dist">---</span></p>
         </div>
     </div>
 
-    <div id="tab-crane-config" class="tab-content">
-        <div class="group">
-            <span class="group-title">Calibration Pins (X, Y, Z)</span>
-            <div class="input-row">
-                <div class="input-col"><label>Boom Pin X</label><input type="number" step="0.001" id="x_bp" class="st"></div>
-                <div class="input-col"><label>Y</label><input type="number" step="0.001" id="y_bp" class="st"></div>
-                <div class="input-col"><label>Z</label><input type="number" step="0.001" id="z_bp" class="st"></div>
-            </div>
-            <div class="input-row">
-                <div class="input-col"><label>Stick Pin X</label><input type="number" step="0.001" id="x_st" class="st"></div>
-                <div class="input-col"><label>Y</label><input type="number" step="0.001" id="y_st" class="st"></div>
-                <div class="input-col"><label>Z</label><input type="number" step="0.001" id="z_st" class="st"></div>
-            </div>
-            <div class="input-row">
-                <div class="input-col"><label>Bucket Pin X</label><input type="number" step="0.001" id="x_bu" class="st"></div>
-                <div class="input-col"><label>Y</label><input type="number" step="0.001" id="y_bu" class="st"></div>
-                <div class="input-col"><label>Z</label><input type="number" step="0.001" id="z_bu" class="st"></div>
-            </div>
+    <div id="tab2" class="tab-content">
+        <div class="input-group">
+            <label>Boom Pin (X, Y, Z)</label>
+            <div class="row"><input type="number" id="xbp" class="st"><input type="number" id="ybp" class="st"><input type="number" id="zbp" class="st"></div>
         </div>
-        <div class="group">
-            <span class="group-title">S3 Lever Pin</span>
-            <div class="input-row">
-                <div class="input-col"><label>S3 X</label><input type="number" step="0.001" id="x_s3" class="st"></div>
-                <div class="input-col"><label>Y</label><input type="number" step="0.001" id="y_s3" class="st"></div>
-                <div class="input-col"><label>Z</label><input type="number" step="0.001" id="z_s3" class="st"></div>
-            </div>
+        <div class="input-group">
+            <label>Stick Pin (X, Y, Z)</label>
+            <div class="row"><input type="number" id="xst" class="st"><input type="number" id="yst" class="st"><input type="number" id="zst" class="st"></div>
         </div>
-        <button class="calc-btn" onclick="calcCr()">Calculate Crane Config</button>
-        <button class="reset-btn" onclick="resAll()">Reset All Stored Data</button>
-        <div class="results-area">
-            <div class="res-section-title">CRANE RESULTS</div>
-            <div class="res-line" style="color:var(--accent-blue)"><span>Boom Stick V (ΔZ):</span> <b id="r-bsV">---</b></div>
-            <div class="res-line"><span>Boom Length:</span> <b id="r-boomL">---</b></div>
-            <div class="res-line"><span>Stick Length:</span> <b id="r-stickL">---</b></div>
-            <div class="res-line"><span>S2 (Along):</span> <b id="r-s2">---</b></div>
-            <div class="res-line"><span>S3 (Perp):</span> <b id="r-s3">---</b></div>
+        <div class="input-group">
+            <label>Bucket Pin (X, Y, Z)</label>
+            <div class="row"><input type="number" id="xbu" class="st"><input type="number" id="ybu" class="st"><input type="number" id="zbu" class="st"></div>
+        </div>
+        <div class="input-group">
+            <label>S3 Pin (X, Y, Z)</label>
+            <div class="row"><input type="number" id="xs3" class="st"><input type="number" id="ys3" class="st"><input type="number" id="zs3" class="st"></div>
+        </div>
+        <button onclick="calculateTab2()">Calculate Crane Config</button>
+        <div class="results" id="res2">
+            <p style="color: blue;">Boom Stick V (ΔZ): <span id="out-bsv">---</span></p>
+            <p>Boom Length: <span id="out-bl">---</span></p>
+            <p>Stick Length: <span id="out-sl">---</span></p>
+            <p>S2 (Along Stick): <span id="out-s2">---</span></p>
+            <p>S3 (Perp Stick): <span id="out-s3">---</span></p>
         </div>
     </div>
 
-    <div class="footer">History enabled. Created for Hydrographic Surveying.</div>
+    <button class="reset-btn" onclick="resetData()">Reset All Data</button>
 </div>
 
 <script>
-    const gv = (id) => { const el = document.getElementById(id); return el && el.value !== "" ? parseFloat(el.value) : null; };
-    const sr = (id, val) => { document.getElementById(id).innerText = val; localStorage.setItem('res_'+id, val); };
-    const fmt = (v, u="") => (v === null || isNaN(v)) ? "---" : v.toFixed(3) + u;
-
-    function openTab(e, t) {
-        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-        document.getElementById(t).classList.add("active");
-        e.currentTarget.classList.add("active");
-        localStorage.setItem('active_tab', t);
+    function showTab(tabIndex) {
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        document.getElementById('tab' + tabIndex).classList.add('active');
+        document.getElementById('tab' + tabIndex + '-btn').classList.add('active');
+        localStorage.setItem('activeTab', tabIndex);
     }
 
-    function calcGeo() {
-        const d = { x1:gv('X1'), y1:gv('Y1'), z1:gv('Z1'), x2:gv('X2'), y2:gv('Y2'), z2:gv('Z2'), xs:gv('Xs'), ys:gv('Ys'), zs:gv('Zs'), xp:gv('Xp'), yp:gv('Yp'), zp:gv('Zp'), xb:gv('Xb'), yb:gv('Yb') };
-        if(d.xs !== null && d.xp !== null && d.xb !== null) {
-            const xc = (d.xs + d.xp)/2, yc = (d.ys + d.yp)/2, zc = (d.zs + d.zp)/2;
-            const hR = Math.atan2(d.xb - xc, d.yb - yc);
-            const mH = ((hR * 180/Math.PI) + 360) % 360;
-            const cf = (x,y,z) => ({ f: (y-yc)*Math.cos(hR)+(x-xc)*Math.sin(hR), s: (x-xc)*Math.cos(hR)-(y-yc)*Math.sin(hR), u: z-zc });
-            const a1 = cf(d.x1, d.y1, d.z1), a2 = cf(d.x2, d.y2, d.z2);
-            sr('r-mH', fmt(mH, "°"));
-            sr('r-a1', `${fmt(a1.f)}, ${fmt(a1.s)}, ${fmt(a1.u)}`);
-            sr('r-a2', `${fmt(a2.f)}, ${fmt(a2.s)}, ${fmt(a2.u)}`);
+    const gv = (id) => { const val = document.getElementById(id).value; return val === "" ? null : parseFloat(val); };
+    const fmt = (v) => v === null || isNaN(v) ? "---" : v.toFixed(3);
+
+    function calculateTab1() {
+        const x1=gv('x1'), y1=gv('y1'), z1=gv('z1'), x2=gv('x2'), y2=gv('y2'), z2=gv('z2');
+        const xs=gv('xs'), ys=gv('ys'), zs=gv('zs'), xp=gv('xp'), yp=gv('yp'), zp=gv('zp');
+        const xb=gv('xb'), yb=gv('yb'), zb=gv('zb');
+
+        // Antenna Distance (Always calculated if x1,x2 exist)
+        if(x1 !== null && x2 !== null) {
+            const dH = Math.sqrt((x1-x2)**2 + (y1-y2)**2);
+            document.getElementById('out-dist').innerText = fmt(dH) + " m";
+            localStorage.setItem('res-out-dist', fmt(dH) + " m");
         }
-    }
 
-    function calcCr() {
-        const bp = {x:gv('x_bp'), y:gv('y_bp'), z:gv('z_bp')}, st = {x:gv('x_st'), y:gv('y_st'), z:gv('z_st')}, bu = {x:gv('x_bu'), y:gv('y_bu'), z:gv('z_bu')}, s3p = {x:gv('x_s3'), y:gv('y_s3'), z:gv('z_s3')};
-        const d3d = (p1, p2) => Math.sqrt((p1.x-p2.x)**2 + (p1.y-p2.y)**2 + (p1.z-p2.z)**2);
-        if(bp.z !== null && st.z !== null) sr('r-bsV', fmt(bp.z - st.z, " m"));
-        if(bp.x !== null && st.x !== null) sr('r-boomL', fmt(d3d(bp, st), " m"));
-        const sL = (st.x !== null && bu.x !== null) ? d3d(st, bu) : null;
-        if(sL) {
-            sr('r-stickL', fmt(sL, " m"));
-            if(s3p.x !== null) {
-                const v_st_bu = { x: bu.x - st.x, y: bu.y - st.y, z: bu.z - st.z };
-                const v_st_s3 = { x: s3p.x - st.x, y: s3p.y - st.y, z: s3p.z - st.z };
-                const cp = { x: v_st_s3.y*v_st_bu.z - v_st_s3.z*v_st_bu.y, y: v_st_s3.z*v_st_bu.x - v_st_s3.x*v_st_bu.z, z: v_st_s3.x*v_st_bu.y - v_st_s3.y*v_st_bu.x };
-                const s3v = Math.sqrt(cp.x**2 + cp.y**2 + cp.z**2) / sL;
-                const v_bu_st = { x: st.x - bu.x, y: st.y - bu.y, z: st.z - bu.z }, v_bu_s3 = { x: s3p.x - bu.x, y: s3p.y - bu.y, z: s3p.z - bu.z };
-                const s2v = (v_bu_s3.x*v_bu_st.x + v_bu_s3.y*v_bu_st.y + v_bu_s3.z*v_bu_st.z) / sL;
-                sr('r-s2', fmt(s2v, " m")); sr('r-s3', fmt(s3v, " m"));
+        if(xs !== null && xp !== null && xb !== null) {
+            const xc = (xs + xp) / 2, yc = (ys + yp) / 2, zc = (zs + zp) / 2;
+            const hR = Math.atan2(xb - xc, yb - yc);
+            const heading = ((hR * 180 / Math.PI) + 360) % 360;
+            document.getElementById('out-h').innerText = fmt(heading) + "°";
+            localStorage.setItem('res-out-h', fmt(heading) + "°");
+
+            const getO = (x, y, z) => ({
+                f: (y - yc) * Math.cos(hR) + (x - xc) * Math.sin(hR),
+                s: (x - xc) * Math.cos(hR) - (y - yc) * Math.sin(hR),
+                u: z - zc
+            });
+
+            if(x1 !== null) {
+                const a1 = getO(x1, y1, z1);
+                const txt = `${fmt(a1.f)}, ${fmt(a1.s)}, ${fmt(a1.u)}`;
+                document.getElementById('out-a1').innerText = txt;
+                localStorage.setItem('res-out-a1', txt);
+            }
+            if(x2 !== null) {
+                const a2 = getO(x2, y2, z2);
+                const txt = `${fmt(a2.f)}, ${fmt(a2.s)}, ${fmt(a2.u)}`;
+                document.getElementById('out-a2').innerText = txt;
+                localStorage.setItem('res-out-a2', txt);
             }
         }
     }
 
-    function sv() { const d = {}; document.querySelectorAll('.st').forEach(e => d[e.id] = e.value); localStorage.setItem('ex_data', JSON.stringify(d)); }
-    function ld() {
-        const d = JSON.parse(localStorage.getItem('ex_data'));
-        if(d) Object.keys(d).forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = d[id]; });
-        ['r-mH','r-a1','r-a2','r-bsV','r-boomL','r-stickL','r-s2','r-s3'].forEach(id => { const v = localStorage.getItem('res_'+id); if(v) document.getElementById(id).innerText = v; });
-        const at = localStorage.getItem('active_tab');
-        if(at) { const bid = at === 'tab-geometry' ? 'btn-geo' : 'btn-crane'; document.getElementById(bid).click(); }
-    }
-    function resAll() { if(confirm("Clear everything?")) { localStorage.clear(); location.reload(); } }
+    function calculateTab2() {
+        const xbp=gv('xbp'), ybp=gv('ybp'), zbp=gv('zbp');
+        const xst=gv('xst'), yst=gv('yst'), zst=gv('zst');
+        const xbu=gv('xbu'), ybu=gv('ybu'), zbu=gv('zbu');
+        const xs3=gv('xs3'), ys3=gv('ys3'), zs3=gv('zs3');
 
-    document.querySelectorAll('.st').forEach(e => e.addEventListener('input', sv));
-    window.onload = ld;
+        const dist = (p1, p2) => Math.sqrt((p1.x-p2.x)**2 + (p1.y-p2.y)**2 + (p1.z-p2.z)**2);
+
+        if(zbp !== null && zst !== null) {
+            const bsv = zbp - zst;
+            document.getElementById('out-bsv').innerText = fmt(bsv) + " m";
+            localStorage.setItem('res-out-bsv', fmt(bsv) + " m");
+        }
+
+        if(xbp !== null && xst !== null) {
+            const bl = dist({x:xbp,y:ybp,z:zbp},{x:xst,y:yst,z:zst});
+            document.getElementById('out-bl').innerText = fmt(bl) + " m";
+            localStorage.setItem('res-out-bl', fmt(bl) + " m");
+        }
+
+        const sl = (xst !== null && xbu !== null) ? dist({x:xst,y:yst,z:zst},{x:xbu,y:ybu,z:zbu}) : null;
+        if(sl) {
+            document.getElementById('out-sl').innerText = fmt(sl) + " m";
+            localStorage.setItem('res-out-sl', fmt(sl) + " m");
+
+            if(xs3 !== null) {
+                const v1 = {x:xbu-xst, y:ybu-yst, z:zbu-zst};
+                const v2 = {x:xs3-xst, y:ys3-yst, z:zs3-zst};
+                const cp = {x:v2.y*v1.z-v2.z*v1.y, y:v2.z*v1.x-v2.x*v1.z, z:v2.x*v1.y-v2.y*v1.x};
+                const s3 = Math.sqrt(cp.x**2 + cp.y**2 + cp.z**2) / sl;
+                const v3 = {x:xst-xbu, y:yst-ybu, z:zst-zbu};
+                const v4 = {x:xs3-xbu, y:ys3-ybu, z:zs3-zbu};
+                const s2 = (v4.x*v3.x + v4.y*v3.y + v4.z*v3.z) / sl;
+
+                document.getElementById('out-s2').innerText = fmt(s2) + " m";
+                document.getElementById('out-s3').innerText = fmt(s3) + " m";
+                localStorage.setItem('res-out-s2', fmt(s2) + " m");
+                localStorage.setItem('res-out-s3', fmt(s3) + " m");
+            }
+        }
+    }
+
+    function saveInputs() {
+        const data = {};
+        document.querySelectorAll('.st').forEach(el => data[el.id] = el.value);
+        localStorage.setItem('appData', JSON.stringify(data));
+    }
+
+    function loadData() {
+        const data = JSON.parse(localStorage.getItem('appData'));
+        if(data) Object.keys(data).forEach(id => document.getElementById(id).value = data[id]);
+
+        const resIds = ['out-h','out-a1','out-a2','out-dist','out-bsv','out-bl','out-sl','out-s2','out-s3'];
+        resIds.forEach(id => {
+            const val = localStorage.getItem('res-' + id);
+            if(val) document.getElementById(id).innerText = val;
+        });
+
+        const activeTab = localStorage.getItem('activeTab');
+        if(activeTab) showTab(activeTab);
+    }
+
+    function resetData() {
+        if(confirm("Reset all?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    document.querySelectorAll('.st').forEach(el => el.addEventListener('input', saveInputs));
+    window.onload = loadData;
 </script>
 </body>
 </html>
