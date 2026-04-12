@@ -1,220 +1,138 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Excavator Calculator</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; display: flex; justify-content: center; }
-        .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
-        .tabs { display: flex; justify-content: space-around; margin-bottom: 20px; border-bottom: 2px solid #ccc; }
-        .tab { padding: 10px; cursor: pointer; font-weight: bold; width: 50%; text-align: center; }
-        .tab.active { border-bottom: 3px solid #007bff; color: #007bff; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .input-group { margin-bottom: 10px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; }
-        .row { display: flex; gap: 10px; }
-        input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; text-align: center; }
-        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px; }
-        button:hover { background: #0056b3; }
-        .results { margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 5px; }
-        .results p { margin: 5px 0; font-weight: bold; }
-        .reset-btn { background: #dc3545; margin-top: 10px; }
-        .reset-btn:hover { background: #a71d2a; }
-    </style>
-</head>
-<body>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Excavator Geometry</title><style>
+body { font-family: Arial; background:#f1f5f9; margin:0; }
+.card { max-width:600px; margin:auto; background:#fff; border-radius:15px; overflow:hidden; }
+.header { background:#0f172a; color:#fff; padding:15px; text-align:center; }
+.tabs { display:flex; background:#1e293b; }
+.tab-btn { flex:1; padding:10px; color:#94a3b8; background:none; border:none; cursor:pointer; }
+.tab-btn.active { color:#fff; border-bottom:2px solid #38bdf8; }
+.tab-content { display:none; padding:15px; }
+.tab-content.active { display:block; }
+input { width:100%; padding:8px; margin:3px 0; text-align:center; }
+button { width:100%; padding:12px; margin-top:10px; background:#059669; color:#fff; border:none; border-radius:8px; }
+#threeContainer { width:100%; height:400px; }
+</style></head><body><div class="card"><div class="header">
+<h2>Excavator Geometry</h2>
+</div><div class="tabs">
+<button class="tab-btn active" onclick="openTab(event,'calib')">Calibration</button>
+<button class="tab-btn" onclick="openTab(event,'diagram')">3D View</button>
+</div><div id="calib" class="tab-content active"><h4>Boom Pin</h4>
+<input id="x_bp" placeholder="X">
+<input id="y_bp" placeholder="Y">
+<input id="z_bp" placeholder="Z"><h4>Stick Pin</h4>
+<input id="x_st">
+<input id="y_st">
+<input id="z_st"><h4>Bucket Pin</h4>
+<input id="x_bu">
+<input id="y_bu">
+<input id="z_bu"><button onclick="calc()">Calculate + Show 3D</button>
 
-<div class="container">
-    <div class="tabs">
-        <div class="tab active" id="tab1-btn" onclick="showTab(1)">Geometry</div>
-        <div class="tab" id="tab2-btn" onclick="showTab(2)">Crane Config</div>
-    </div>
+</div><div id="diagram" class="tab-content">
+<div id="threeContainer"></div>
+</div></div><!-- 3D LIB --><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/controls/OrbitControls.js"></script><script>
 
-    <div id="tab1" class="tab-content active">
-        <div class="input-group">
-            <label>Antenna 1 (X, Y, Z)</label>
-            <div class="row"><input type="number" id="x1" placeholder="X" class="st"><input type="number" id="y1" placeholder="Y" class="st"><input type="number" id="z1" placeholder="Z" class="st"></div>
-        </div>
-        <div class="input-group">
-            <label>Antenna 2 (X, Y, Z)</label>
-            <div class="row"><input type="number" id="x2" placeholder="X" class="st"><input type="number" id="y2" placeholder="Y" class="st"><input type="number" id="z2" placeholder="Z" class="st"></div>
-        </div>
-        <div class="input-group">
-            <label>Boom Pin STBD (X, Y, Z)</label>
-            <div class="row"><input type="number" id="xs" placeholder="X" class="st"><input type="number" id="ys" placeholder="Y" class="st"><input type="number" id="zs" placeholder="Z" class="st"></div>
-        </div>
-        <div class="input-group">
-            <label>Boom Pin PORT (X, Y, Z)</label>
-            <div class="row"><input type="number" id="xp" placeholder="X" class="st"><input type="number" id="yp" placeholder="Y" class="st"><input type="number" id="zp" placeholder="Z" class="st"></div>
-        </div>
-        <div class="input-group">
-            <label>Bucket Center (X, Y, Z)</label>
-            <div class="row"><input type="number" id="xb" placeholder="X" class="st"><input type="number" id="yb" placeholder="Y" class="st"><input type="number" id="zb" placeholder="Z" class="st"></div>
-        </div>
-        <button onclick="calculateTab1()">Calculate Geometry</button>
-        <div class="results" id="res1">
-            <p>Heading: <span id="out-h">---</span></p>
-            <p>Antenna 1 Offsets: <span id="out-a1">---</span></p>
-            <p>Antenna 2 Offsets: <span id="out-a2">---</span></p>
-            <p>Antenna H Distance: <span id="out-dist">---</span></p>
-        </div>
-    </div>
+// ===== TAB =====
+function openTab(evt, id){
+document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+evt.currentTarget.classList.add('active');
+}
 
-    <div id="tab2" class="tab-content">
-        <div class="input-group">
-            <label>Boom Pin (X, Y, Z)</label>
-            <div class="row"><input type="number" id="xbp" class="st"><input type="number" id="ybp" class="st"><input type="number" id="zbp" class="st"></div>
-        </div>
-        <div class="input-group">
-            <label>Stick Pin (X, Y, Z)</label>
-            <div class="row"><input type="number" id="xst" class="st"><input type="number" id="yst" class="st"><input type="number" id="zst" class="st"></div>
-        </div>
-        <div class="input-group">
-            <label>Bucket Pin (X, Y, Z)</label>
-            <div class="row"><input type="number" id="xbu" class="st"><input type="number" id="ybu" class="st"><input type="number" id="zbu" class="st"></div>
-        </div>
-        <div class="input-group">
-            <label>S3 Pin (X, Y, Z)</label>
-            <div class="row"><input type="number" id="xs3" class="st"><input type="number" id="ys3" class="st"><input type="number" id="zs3" class="st"></div>
-        </div>
-        <button onclick="calculateTab2()">Calculate Crane Config</button>
-        <div class="results" id="res2">
-            <p style="color: blue;">Boom Stick V (ΔZ): <span id="out-bsv">---</span></p>
-            <p>Boom Length: <span id="out-bl">---</span></p>
-            <p>Stick Length: <span id="out-sl">---</span></p>
-            <p>S2 (Along Stick): <span id="out-s2">---</span></p>
-            <p>S3 (Perp Stick): <span id="out-s3">---</span></p>
-        </div>
-    </div>
+// ===== GET POINT =====
+function getP(id){
+const x=parseFloat(document.getElementById('x_'+id).value);
+const y=parseFloat(document.getElementById('y_'+id).value);
+const z=parseFloat(document.getElementById('z_'+id).value);
+if(isNaN(x)||isNaN(y)||isNaN(z)) return null;
+return {x,y,z};
+}
 
-    <button class="reset-btn" onclick="resetData()">Reset All Data</button>
-</div>
+// ===== 3D ENGINE =====
+let scene,camera,renderer,controls;
 
-<script>
-    function showTab(tabIndex) {
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-        document.getElementById('tab' + tabIndex).classList.add('active');
-        document.getElementById('tab' + tabIndex + '-btn').classList.add('active');
-        localStorage.setItem('activeTab', tabIndex);
-    }
+function init3D(){
+const container=document.getElementById('threeContainer');
 
-    const gv = (id) => { const val = document.getElementById(id).value; return val === "" ? null : parseFloat(val); };
-    const fmt = (v) => v === null || isNaN(v) ? "---" : v.toFixed(3);
+scene=new THREE.Scene();
+scene.background=new THREE.Color(0xf1f5f9);
 
-    function calculateTab1() {
-        const x1=gv('x1'), y1=gv('y1'), z1=gv('z1'), x2=gv('x2'), y2=gv('y2'), z2=gv('z2');
-        const xs=gv('xs'), ys=gv('ys'), zs=gv('zs'), xp=gv('xp'), yp=gv('yp'), zp=gv('zp');
-        const xb=gv('xb'), yb=gv('yb'), zb=gv('zb');
+camera=new THREE.PerspectiveCamera(75,container.clientWidth/400,0.1,1000);
+camera.position.set(5,5,5);
 
-        // Antenna Distance (Always calculated if x1,x2 exist)
-        if(x1 !== null && x2 !== null) {
-            const dH = Math.sqrt((x1-x2)**2 + (y1-y2)**2);
-            document.getElementById('out-dist').innerText = fmt(dH) + " m";
-            localStorage.setItem('res-out-dist', fmt(dH) + " m");
-        }
+renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(container.clientWidth,400);
 
-        if(xs !== null && xp !== null && xb !== null) {
-            const xc = (xs + xp) / 2, yc = (ys + yp) / 2, zc = (zs + zp) / 2;
-            const hR = Math.atan2(xb - xc, yb - yc);
-            const heading = ((hR * 180 / Math.PI) + 360) % 360;
-            document.getElementById('out-h').innerText = fmt(heading) + "°";
-            localStorage.setItem('res-out-h', fmt(heading) + "°");
+container.innerHTML="";
+container.appendChild(renderer.domElement);
 
-            const getO = (x, y, z) => ({
-                f: (y - yc) * Math.cos(hR) + (x - xc) * Math.sin(hR),
-                s: (x - xc) * Math.cos(hR) - (y - yc) * Math.sin(hR),
-                u: z - zc
-            });
+const light=new THREE.DirectionalLight(0xffffff,1);
+light.position.set(10,10,10);
+scene.add(light);
 
-            if(x1 !== null) {
-                const a1 = getO(x1, y1, z1);
-                const txt = `${fmt(a1.f)}, ${fmt(a1.s)}, ${fmt(a1.u)}`;
-                document.getElementById('out-a1').innerText = txt;
-                localStorage.setItem('res-out-a1', txt);
-            }
-            if(x2 !== null) {
-                const a2 = getO(x2, y2, z2);
-                const txt = `${fmt(a2.f)}, ${fmt(a2.s)}, ${fmt(a2.u)}`;
-                document.getElementById('out-a2').innerText = txt;
-                localStorage.setItem('res-out-a2', txt);
-            }
-        }
-    }
+controls=new THREE.OrbitControls(camera,renderer.domElement);
 
-    function calculateTab2() {
-        const xbp=gv('xbp'), ybp=gv('ybp'), zbp=gv('zbp');
-        const xst=gv('xst'), yst=gv('yst'), zst=gv('zst');
-        const xbu=gv('xbu'), ybu=gv('ybu'), zbu=gv('zbu');
-        const xs3=gv('xs3'), ys3=gv('ys3'), zs3=gv('zs3');
+animate();
+}
 
-        const dist = (p1, p2) => Math.sqrt((p1.x-p2.x)**2 + (p1.y-p2.y)**2 + (p1.z-p2.z)**2);
+function animate(){
+requestAnimationFrame(animate);
+if(controls) controls.update();
+if(renderer) renderer.render(scene,camera);
+}
 
-        if(zbp !== null && zst !== null) {
-            const bsv = zbp - zst;
-            document.getElementById('out-bsv').innerText = fmt(bsv) + " m";
-            localStorage.setItem('res-out-bsv', fmt(bsv) + " m");
-        }
+// ===== DRAW =====
+function drawPoint(p,color){
+if(!p) return;
+const geo=new THREE.SphereGeometry(0.15);
+const mat=new THREE.MeshStandardMaterial({color});
+const m=new THREE.Mesh(geo,mat);
+m.position.set(p.x,p.y,p.z);
+scene.add(m);
+}
 
-        if(xbp !== null && xst !== null) {
-            const bl = dist({x:xbp,y:ybp,z:zbp},{x:xst,y:yst,z:zst});
-            document.getElementById('out-bl').innerText = fmt(bl) + " m";
-            localStorage.setItem('res-out-bl', fmt(bl) + " m");
-        }
+function drawLine(p1,p2){
+if(!p1||!p2) return;
+const material=new THREE.LineBasicMaterial();
+const points=[
+new THREE.Vector3(p1.x,p1.y,p1.z),
+new THREE.Vector3(p2.x,p2.y,p2.z)
+];
+const geo=new THREE.BufferGeometry().setFromPoints(points);
+const line=new THREE.Line(geo,material);
+scene.add(line);
+}
 
-        const sl = (xst !== null && xbu !== null) ? dist({x:xst,y:yst,z:zst},{x:xbu,y:ybu,z:zbu}) : null;
-        if(sl) {
-            document.getElementById('out-sl').innerText = fmt(sl) + " m";
-            localStorage.setItem('res-out-sl', fmt(sl) + " m");
+// ===== MAIN =====
+function calc(){
 
-            if(xs3 !== null) {
-                const v1 = {x:xbu-xst, y:ybu-yst, z:zbu-zst};
-                const v2 = {x:xs3-xst, y:ys3-yst, z:zs3-zst};
-                const cp = {x:v2.y*v1.z-v2.z*v1.y, y:v2.z*v1.x-v2.x*v1.z, z:v2.x*v1.y-v2.y*v1.x};
-                const s3 = Math.sqrt(cp.x**2 + cp.y**2 + cp.z**2) / sl;
-                const v3 = {x:xst-xbu, y:yst-ybu, z:zst-zbu};
-                const v4 = {x:xs3-xbu, y:ys3-ybu, z:zs3-zbu};
-                const s2 = (v4.x*v3.x + v4.y*v3.y + v4.z*v3.z) / sl;
+const BP=getP('bp');
+const ST=getP('st');
+const BU=getP('bu');
 
-                document.getElementById('out-s2').innerText = fmt(s2) + " m";
-                document.getElementById('out-s3').innerText = fmt(s3) + " m";
-                localStorage.setItem('res-out-s2', fmt(s2) + " m");
-                localStorage.setItem('res-out-s3', fmt(s3) + " m");
-            }
-        }
-    }
+if(!BP||!ST||!BU){
+alert("ادخل القيم كاملة");
+return;
+}
 
-    function saveInputs() {
-        const data = {};
-        document.querySelectorAll('.st').forEach(el => data[el.id] = el.value);
-        localStorage.setItem('appData', JSON.stringify(data));
-    }
+// INIT 3D
+init3D();
 
-    function loadData() {
-        const data = JSON.parse(localStorage.getItem('appData'));
-        if(data) Object.keys(data).forEach(id => document.getElementById(id).value = data[id]);
+// DRAW
+drawPoint(BP,0x0000ff);
+drawPoint(ST,0x00ff00);
+drawPoint(BU,0xff0000);
 
-        const resIds = ['out-h','out-a1','out-a2','out-dist','out-bsv','out-bl','out-sl','out-s2','out-s3'];
-        resIds.forEach(id => {
-            const val = localStorage.getItem('res-' + id);
-            if(val) document.getElementById(id).innerText = val;
-        });
+drawLine(BP,ST);
+drawLine(ST,BU);
 
-        const activeTab = localStorage.getItem('activeTab');
-        if(activeTab) showTab(activeTab);
-    }
+// AUTO SWITCH TAB
+document.querySelectorAll('.tab-btn')[1].click();
 
-    function resetData() {
-        if(confirm("Reset all?")) {
-            localStorage.clear();
-            location.reload();
-        }
-    }
+}
 
-    document.querySelectorAll('.st').forEach(el => el.addEventListener('input', saveInputs));
-    window.onload = loadData;
-</script>
-</body>
+</script></body>
 </html>
